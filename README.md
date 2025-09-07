@@ -8,7 +8,8 @@
 RepoRover is a powerful and intuitive Streamlit web application that allows you to have intelligent conversations with any public GitHub repository. Simply provide a repository URL, and RepoRover will clone it, index the code, and empower you to ask questions about the entire codebase or specific files.
 
 Here is demo of my project:
-<video src="demo.webm" controls width="600"></video>
+[Watch the demo](demo.mp4)
+
 
 
 -----
