@@ -66,32 +66,17 @@ Follow these steps to set up and run RepoRover on your local machine.
     git clone https://github.com/your-username/RepoRover.git
     cd RepoRover
     ```
-
-2.  **Create a Virtual Environment** (Recommended)
-
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-    ```
-
 3.  **Install Dependencies**
-    Create a `requirements.txt` file with the following content:
-
+    Install Following packages:
     ```txt
     streamlit
     chromadb
     langchain
     sentence-transformers
     GitPython
+    langchain
     ```
-
-    Then, install the packages:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4.  **Pull the Ollama Model**
+5.  **Pull the Ollama Model**
     RepoRover uses `codellama:7b` by default. Pull it using the following command:
 
     ```bash
