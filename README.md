@@ -1,9 +1,3 @@
-Of course\! A good `README.md` is essential for any project. Based on your Python script, here is a stylish and comprehensive README file.
-
-You can copy and paste the content below into a new file named `README.md` in your project's root directory.
-
------
-
 # RepoRover: The AI Codebase Navigator 🚀
 
 [](https://www.python.org/)
@@ -120,10 +114,10 @@ Open your web browser and navigate to the local URL provided by Streamlit (usual
 
 ## 💡 Future Improvements
 
-  * [ ] Support for private repositories with authentication.
-  * [ ] Option to choose different Ollama models from the UI.
-  * [ ] Caching indexed repositories to avoid re-processing.
-  * [ ] Dockerize the application for easier deployment.
-  * [ ] Persist chat history across sessions.
+  *  Support for private repositories with authentication.
+  *  Option to choose different Ollama models from the UI.
+  *  Caching indexed repositories to avoid re-processing.
+  *  Dockerize the application for easier deployment.
+  *  Persist chat history across sessions.
 
 -----
