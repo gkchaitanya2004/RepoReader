@@ -90,7 +90,7 @@ Follow these steps to set up and run RepoRover on your local machine.
 Once the setup is complete, run the Streamlit app with this command:
 
 ```bash
-streamlit run your_script_name.py
+streamlit run main.py
 ```
 
 Open your web browser and navigate to the local URL provided by Streamlit (usually `http://localhost:8501`).
