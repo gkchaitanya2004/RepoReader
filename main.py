@@ -13,6 +13,9 @@ DB_PATH = "./repo_db"
 COLLECTION_NAME = "repo_code_collection"
 SUPPORTED_EXTENSIONS = ('.py', '.js', '.java', '.cpp', '.c', '.rb', '.go', '.ts', '.html', '.css', '.md')
 
+if "HF_TOKEN" in st.secrets:
+    os.environ["HF_TOKEN"] = st.secrets["HF_TOKEN"]
+
 # --- Model Loading (Cached) ---
 
 def query_ollama(prompt, model="codellama:7b"):
