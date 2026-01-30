@@ -1,5 +1,4 @@
 import streamlit as st
-import subprocess
 import chromadb
 import os
 import shutil
@@ -19,20 +18,21 @@ if "HF_TOKEN" in st.secrets:
 
 # --- Model Loading (Cached) ---
 
-def query_ollama(prompt, model="codellama:7b"):
-    """Sends a prompt to the Ollama model and returns the response."""
+def query_deepseek(prompt):
+    """Sends a prompt to the DeepSeek model and returns the response."""
     try:
-        client = InferenceClient(token=os.environ.get("HF_TOKEN"))
-        result = client.text_generation(model=model, inputs=prompt)
-        return result.generated_text
-    except FileNotFoundError:
-        st.error("🚨 Ollama not found. Please ensure the 'ollama' command is in your system's PATH.")
-        return None
-    except subprocess.CalledProcessError as e:
-        st.error(f"Error from Ollama: {e.stderr}")
-        return None
+        messages = [{"role": "user", "content": prompt}]
+        client = InferenceClient(token=os.environ["HF_TOKEN"])
+        response = client.chat_completion(
+            model= "deepseek-ai/DeepSeek-V3.2",
+            messages=messages, 
+            max_tokens=500, 
+            temperature=0.1
+        )
+        return response.choices[0].message['content']
     except Exception as e:
-        st.error(f"An unexpected error occurred while calling Ollama: {e}")
+        print(f"An unexpected error occurred while calling DeepSeek: {e}")
+        st.error(f"An unexpected error occurred while calling DeepSeek: {e}")
         return None
 
 def process_repository(repo_url, collection):
@@ -144,15 +144,21 @@ else:
     with col1:
         st.subheader("Explore Files")
         if st.session_state.indexed_files:
-            current_selection = st.session_state.get('selected_file')
-            index = 0
-            if current_selection and current_selection in st.session_state.indexed_files:
-                index = st.session_state.indexed_files.index(current_selection)
+            # Use one consistent, sorted list for both index finding and the widget
+            sorted_files = sorted(st.session_state.indexed_files)
 
+            # Determine the index based on the current session state
+            if st.session_state.selected_file in sorted_files:
+                current_index = sorted_files.index(st.session_state.selected_file)
+            else:
+                current_index = 0
+
+            # The 'key' ensures Streamlit tracks this widget's state automatically
             st.session_state.selected_file = st.selectbox(
                 "Select a file to inspect:", 
-                sorted(st.session_state.indexed_files),
-                index=index
+                sorted_files,
+                index=current_index,
+                key="file_selector"
             )
 
             if st.session_state.selected_file:
@@ -173,14 +179,14 @@ else:
         if prompt:
             st.session_state.messages[repo_chat_key].append({"role": "user", "content": prompt})
             with st.spinner("Searching the repository and generating a response..."):
-                results = collection.query(query_texts=[prompt], n_results=5)
+                file_locator = {"file_path": st.session_state.selected_file} if st.session_state.selected_file else {}
+                results = collection.query(query_texts=[prompt], n_results=5, where=file_locator)
                 context = "\n\n---\n\n".join(results["documents"][0]) if results["documents"] else ""
                 
                 if context:
-                    file_paths = ", ".join(set(meta['file_path'] for meta in results['metadatas'][0]))
-                    full_prompt = f"Based on the following context from files ({file_paths}), answer the user's question.\n\nContext:\n{context}\n\nQuestion: {prompt}\nAnswer:"
+                    full_prompt = f"Based on the following context from files ({st.session_state.selected_file}), answer the user's question.\n\nContext:\n{context}\n\nQuestion: {prompt}\nAnswer:"
                     # Pass the cached model and tokenizer to the query function
-                    response = query_ollama(full_prompt)
+                    response = query_deepseek(full_prompt)
                     st.session_state.messages[repo_chat_key].append({"role": "assistant", "content": response, "context": context})
                 else:
                     st.session_state.messages[repo_chat_key].append({"role": "assistant", "content": "I couldn't find any relevant context in the repository to answer your question.", "context": "No context found."})
