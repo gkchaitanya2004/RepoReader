@@ -5,7 +5,7 @@ import os
 import shutil
 from git import Repo
 from chromadb.utils import embedding_functions
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitter import RecursiveCharacterTextSplitter
 
 # --- Constants ---
 TEMP_DIR = "./temp_repo"
