@@ -1,7 +1,8 @@
 streamlit
 chromadb
 langchain
-langchain
+langchain-community
+langchain-text-splitters
 sentence-transformers
 GitPython
 pysqlite3-binary
