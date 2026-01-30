@@ -6,6 +6,7 @@ import shutil
 from git import Repo
 from chromadb.utils import embedding_functions
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from huggingface_hub import InferenceClient
 
 # --- Constants ---
 TEMP_DIR = "./temp_repo"
@@ -21,14 +22,9 @@ if "HF_TOKEN" in st.secrets:
 def query_ollama(prompt, model="codellama:7b"):
     """Sends a prompt to the Ollama model and returns the response."""
     try:
-        result = subprocess.run(
-            ["ollama", "run", model],
-            input=prompt,
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        return result.stdout
+        client = InferenceClient(token=os.environ.get("HF_TOKEN"))
+        result = client.text_generation(model=model, inputs=prompt)
+        return result.generated_text
     except FileNotFoundError:
         st.error("🚨 Ollama not found. Please ensure the 'ollama' command is in your system's PATH.")
         return None
