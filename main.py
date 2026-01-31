@@ -26,7 +26,6 @@ def query_deepseek(prompt):
         response = client.chat_completion(
             model= "deepseek-ai/DeepSeek-V3.2",
             messages=messages, 
-            max_tokens=500, 
             temperature=0.1
         )
         return response.choices[0].message['content']
