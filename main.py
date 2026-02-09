@@ -4,7 +4,7 @@ import os
 import shutil
 from git import Repo
 from chromadb.utils import embedding_functions
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter,Language
 from huggingface_hub import InferenceClient
 
 # --- Constants ---
@@ -12,6 +12,18 @@ TEMP_DIR = "./temp_repo"
 DB_PATH = "./repo_db"
 COLLECTION_NAME = "repo_code_collection"
 SUPPORTED_EXTENSIONS = ('.py', '.js', '.java', '.cpp', '.c', '.rb', '.go', '.ts', '.html', '.css', '.md')
+EXT_TO_LANG = {
+    '.py': Language.PYTHON,
+    '.js': Language.JAVASCRIPT,
+    '.java': Language.JAVA,
+    '.cpp': Language.CPP,
+    '.c': Language.C,
+    '.rb': Language.RUBY,
+    '.go': Language.GO,
+    '.ts': Language.TS,
+    '.html': Language.HTML,
+    '.md': Language.MARKDOWN
+}
 
 if "HF_TOKEN" in st.secrets:
     os.environ["HF_TOKEN"] = st.secrets["HF_TOKEN"]
@@ -33,6 +45,14 @@ def query_deepseek(prompt):
         print(f"An unexpected error occurred while calling DeepSeek: {e}")
         st.error(f"An unexpected error occurred while calling DeepSeek: {e}")
         return None
+    
+def get_splitter_for_file(file_name):
+    file_extension = os.path.splitext(file_name)[1]
+    language = EXT_TO_LANG.get(file_extension)
+    if language:
+        return RecursiveCharacterTextSplitter.from_language(language, chunk_size=2000, chunk_overlap=200)
+    else:
+        return RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
 
 def process_repository(repo_url, collection):
     if os.path.exists(TEMP_DIR):
@@ -53,10 +73,10 @@ def process_repository(repo_url, collection):
 
     st.info(f"Found {len(files_to_index)} files to index...")
     progress_bar = st.progress(0, text="Starting indexing...")
-    
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
 
+    
     for i, file_path in enumerate(files_to_index):
+        text_splitter = get_splitter_for_file(file_path)
         full_path = os.path.join(TEMP_DIR, file_path)
         try:
             with open(full_path, 'r', encoding='utf-8', errors='ignore') as file:
